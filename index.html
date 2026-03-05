@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТехМонт — Управление проектами и ТЗ с нейросетью</title>
+    
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #38BDF8;
+            --primary-dark: #0EA5E9;
+            --secondary: #10B981;
+            --dark: #0F0F0F;
+            --dark-surface: #171717;
+            --dark-card: #1F1F1F;
+            --dark-border: #2E2E2E;
+            --text-light: #F5F5F5;
+            --text-muted: #A3A3A3;
+            --gradient: linear-gradient(135deg, #38BDF8 0%, #10B981 100%);
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--dark-surface);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--dark-border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--dark-border);
+            z-index: 100;
+            padding: 16px 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--dark-border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 18px;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 80%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 30px;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-size: 52px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        .hero-title span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--dark-border);
+        }
+
+        .floating-card {
+            position: absolute;
+            bottom: -20px;
+            left: -20px;
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .floating-card i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        /* Features Section */
+        .section {
+            padding: 80px 0;
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-title span {
+            color: var(--primary);
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .feature-icon i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* How it works */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .step-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 48px;
+            font-weight: 700;
+            color: rgba(56, 189, 248, 0.1);
+            line-height: 1;
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .step-icon i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* TZ Examples */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .example-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .example-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--dark-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .example-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .example-badge {
+            padding: 4px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 30px;
+            color: var(--secondary);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .example-content {
+            padding: 20px 24px;
+        }
+
+        .example-section {
+            margin-bottom: 16px;
+        }
+
+        .example-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .example-section-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .example-section-list {
+            list-style: none;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .example-section-list li {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .example-section-list li i {
+            font-size: 12px;
+            color: var(--primary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border-radius: 30px;
+            margin: 40px 0;
+        }
+
+        .cta-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .cta-description {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 60px 0 40px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-description {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .footer-column-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            padding-top: 40px;
+            border-top: 1px solid var(--dark-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-links a {
+            color: var(--text-muted);
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .features-grid,
+            .steps-grid,
+            .examples-grid,
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .features-grid,
+            .steps-grid,
+            .examples-grid,
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">ТМ</div>
+                <span class="logo-text">ТехМонт</span>
+            </div>
+            <a href="#contact" class="btn btn-primary">
+                <i class="fas fa-rocket"></i>
+                Начать работу
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div>
+                    <div class="hero-badge">
+                        <i class="fas fa-robot"></i>
+                        Нейросеть в каждом проекте
+                    </div>
+                    <h1 class="hero-title">
+                        Управляйте проектами, а <span>ТЗ сгенерирует</span> нейросеть
+                    </h1>
+                    <p class="hero-description">
+                        ТехМонт — система для управления монтажными проектами в торговых сетях. 
+                        Автоматическая генерация технических заданий, контроль документов, финансовая 
+                        аналитика и чат с менеджером в одном месте.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">500+</span>
+                            <span class="stat-label">Проектов</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">15+</span>
+                            <span class="stat-label">Сетей</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">4</span>
+                            <span class="stat-label">Формат ТЗ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                         alt="ТехМонт Dashboard">
+                    <div class="floating-card">
+                        <i class="fas fa-file-alt"></i>
+                        <div>
+                            <strong>ТЗ готово</strong>
+                            <p style="font-size: 13px; color: var(--text-muted);">Магнит Аптеки</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Возможности <span>платформы</span></h2>
+                <p class="section-subtitle">Всё необходимое для управления проектами в одной экосистеме</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Нейрогенерация ТЗ</h3>
+                    <p class="feature-description">
+                        На основе названия, описания и количества объектов нейросеть создает 
+                        детальное техническое задание, идентичное реальным документам.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-folder-tree"></i>
+                    </div>
+                    <h3 class="feature-title">Документооборот</h3>
+                    <p class="feature-description">
+                        Иерархическая структура папок, загрузка файлов, создание папок 
+                        автоматически при создании проекта.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Финансовая аналитика</h3>
+                    <p class="feature-description">
+                        Графики бюджета, распределение по проектам, детализация расходов 
+                        и прогнозирование затрат.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="feature-title">Чат с менеджером</h3>
+                    <p class="feature-description">
+                        Общий чат и отдельные чаты по проектам. Автоответы и 
+                        счетчики непрочитанных сообщений.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3 class="feature-title">Аналитика проектов</h3>
+                    <p class="feature-description">
+                        Графики выполнения, проблемные объекты, сводные таблицы 
+                        и детализация по каждому проекту.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <h3 class="feature-title">Тёмная тема</h3>
+                    <p class="feature-description">
+                        Carbon и Snow темы с автоматическим переключением и 
+                        адаптацией всех графиков.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Как это <span>работает</span></h2>
+                <p class="section-subtitle">Всего 4 шага от идеи до готового технического задания</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h4 class="step-title">Создайте проект</h4>
+                    <p class="step-description">Введите название, описание, количество объектов и сроки</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h4 class="step-title">Нажмите "Создать ТЗ"</h4>
+                    <p class="step-description">Нейросеть анализирует 4 реальных примера ТЗ</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h4 class="step-title">Получите готовое ТЗ</h4>
+                    <p class="step-description">Структурированный документ с этапами, материалами и отчетами</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h4 class="step-title">Работайте с документами</h4>
+                    <p class="step-description">Автоматически создается папка проекта в разделе Документы</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TZ Examples -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Примеры <span>генерируемых ТЗ</span></h2>
+                <p class="section-subtitle">Нейросеть обучена на реальных документах монтажных проектов</p>
+            </div>
+            <div class="examples-grid">
+                <div class="example-card">
+                    <div class="example-header">
+                        <span class="example-title">Магнит Аптеки</span>
+                        <span class="example-badge">ДП 15-17"</span>
+                    </div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <div class="example-section-title">Цель работ</div>
+                            <div class="example-section-text">
+                                Монтаж дисплеев покупателя на кассовых узлах для отображения информации о товарах
+                            </div>
+                        </div>
+                        <div class="example-section">
+                            <div class="example-section-title">Состав оборудования</div>
+                            <ul class="example-section-list">
+                                <li><i class="fas fa-check"></i> Дисплей покупателя 15-17" – 2 шт</li>
+                                <li><i class="fas fa-check"></i> РОЕ-инжектор – 2 шт</li>
+                                <li><i class="fas fa-check"></i> Кабель ВВГнГ 3х1.5 мм – 2 м</li>
+                                <li><i class="fas fa-check"></i> Кабель UTP4, кат.5е – 150 м</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="example-card">
+                    <div class="example-header">
+                        <span class="example-title">Магнит ДП ПЧ</span>
+                        <span class="example-badge">Комплекс</span>
+                    </div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <div class="example-section-title">Цель работ</div>
+                            <div class="example-section-text">
+                                Комплексный монтаж системы радиовещания, прайс-чеккеров и ТВ-панелей
+                            </div>
+                        </div>
+                        <div class="example-section">
+                            <div class="example-section-title">Этапы монтажа</div>
+                            <ul class="example-section-list">
+                                <li><i class="fas fa-check"></i> Установка ТКШ на высоте 1,5-2,2 м</li>
+                                <li><i class="fas fa-check"></i> Монтаж громкоговорителей под потолок</li>
+                                <li><i class="fas fa-check"></i> Прокладка кабеля КПСНГ FRLS до АПС</li>
+                                <li><i class="fas fa-check"></i> Подключение POE инжекторов</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="example-card">
+                    <div class="example-header">
+                        <span class="example-title">Лента (43")</span>
+                        <span class="example-badge">Супермаркет</span>
+                    </div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <div class="example-section-title">Цель работ</div>
+                            <div class="example-section-text">
+                                Монтаж рекламных ТВ-панелей 43” в проходах между касс
+                            </div>
+                        </div>
+                        <div class="example-section">
+                            <div class="example-section-title">Особенности</div>
+                            <ul class="example-section-list">
+                                <li><i class="fas fa-check"></i> Высота 2600-2800 мм от пола</li>
+                                <li><i class="fas fa-check"></i> Настройка таймера включения/выключения</li>
+                                <li><i class="fas fa-check"></i> Прокладка в негорючей гофре D20</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="example-card">
+                    <div class="example-header">
+                        <span class="example-title">Метро (32")</span>
+                        <span class="example-badge">Гипермаркет</span>
+                    </div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <div class="example-section-title">Цель работ</div>
+                            <div class="example-section-text">
+                                Монтаж рекламных ТВ-панелей 32” в кассовой зоне и зоне алкоголя
+                            </div>
+                        </div>
+                        <div class="example-section">
+                            <div class="example-section-title">Регистрация</div>
+                            <ul class="example-section-list">
+                                <li><i class="fas fa-check"></i> Регистрация в @adts_job_bot</li>
+                                <li><i class="fas fa-check"></i> Выбор зоны: #кассы / #алко / #инфо</li>
+                                <li><i class="fas fa-check"></i> Активация лицензии через бота</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="container">
+        <div class="cta-section">
+            <div class="cta-content">
+                <h2 class="cta-title">Готовы автоматизировать ТЗ?</h2>
+                <p class="cta-description">
+                    Заполните форму в Битрикс24 — мы свяжемся с вами, проведем демо и 
+                    настроим доступ к платформе для вашей команды
+                </p>
+                <div class="cta-buttons">
+                    <a href="https://b24-h8qakj.bitrix24site.ru/crm_form_4z8ve/" 
+                       target="_blank" 
+                       class="btn btn-primary btn-large">
+                        <i class="fab fa-bitrix"></i>
+                        Заполнить форму Битрикс24
+                    </a>
+                    <a href="#features" class="btn btn-outline btn-large">
+                        <i class="fas fa-play"></i>
+                        Смотреть демо
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">
+                        <div class="logo-icon">ТМ</div>
+                        <span class="logo-text">ТехМонт</span>
+                    </div>
+                    <p class="footer-description">
+                        Платформа для управления проектами и автоматической генерации 
+                        технических заданий с помощью нейросети.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="footer-column-title">Продукт</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Возможности</a></li>
+                        <li><a href="#">Как это работает</a></li>
+                        <li><a href="#">Примеры ТЗ</a></li>
+                        <li><a href="#">Цены</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-column-title">Компания</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">О нас</a></li>
+                        <li><a href="#">Блог</a></li>
+                        <li><a href="#">Вакансии</a></li>
+                        <li><a href="#">Контакты</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-column-title">Поддержка</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Документация</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Техподдержка</a></li>
+                        <li><a href="#">Статус</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>© 2026 ТехМонт. Все права защищены.</div>
+                <div class="social-links">
+                    <a href="#" target="_blank"><i class="fab fa-telegram"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Небольшой скрипт для плавного скролла -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
